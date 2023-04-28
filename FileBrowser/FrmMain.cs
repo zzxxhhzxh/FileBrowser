@@ -308,19 +308,27 @@ namespace FileBrowser
                 var files = Directory.GetFiles(CurPath);
                 foreach (var dir in dirs)
                 {
-                    var dInfo = new DirectoryInfo(dir);
-                    var sInfo = new SHFILEINFO();
-                    SHGetFileInfo(dir, 0x80, ref sInfo, (uint)Marshal.SizeOf(sInfo), 0x100 | 0x400);
-                    imgFile.Images.Add(dInfo.Name, (Icon)Icon.FromHandle(sInfo.hIcon).Clone());
-                    lvwFile.Items.Add(new ListViewItem(new string[] { dInfo.Name, "", "Folder", dInfo.LastWriteTime.ToString() }, dInfo.Name));
+                    try
+                    {
+                        var dInfo = new DirectoryInfo(dir);
+                        var sInfo = new SHFILEINFO();
+                        SHGetFileInfo(dir, 0x80, ref sInfo, (uint)Marshal.SizeOf(sInfo), 0x100 | 0x400);
+                        imgFile.Images.Add(dInfo.Name, (Icon)Icon.FromHandle(sInfo.hIcon).Clone());
+                        lvwFile.Items.Add(new ListViewItem(new string[] { dInfo.Name, "", "Folder", dInfo.LastWriteTime.ToString() }, dInfo.Name));
+                    }
+                    catch { continue; }
                 }
                 foreach (var file in files)
                 {
-                    var fInfo = new FileInfo(file);
-                    var sInfo = new SHFILEINFO();
-                    SHGetFileInfo(file, 0x80, ref sInfo, (uint)Marshal.SizeOf(sInfo), 0x100 | 0x400);
-                    imgFile.Images.Add(fInfo.Name, (Icon)Icon.FromHandle(sInfo.hIcon).Clone());
-                    lvwFile.Items.Add(new ListViewItem(new string[] { fInfo.Name, $"{fInfo.Length / 1024.0:F1} KB", fInfo.Extension, fInfo.LastWriteTime.ToString() }, fInfo.Name));
+                    try
+                    {
+                        var fInfo = new FileInfo(file);
+                        var sInfo = new SHFILEINFO();
+                        SHGetFileInfo(file, 0x80, ref sInfo, (uint)Marshal.SizeOf(sInfo), 0x100 | 0x400);
+                        imgFile.Images.Add(fInfo.Name, (Icon)Icon.FromHandle(sInfo.hIcon).Clone());
+                        lvwFile.Items.Add(new ListViewItem(new string[] { fInfo.Name, $"{fInfo.Length / 1024.0:F1} KB", fInfo.Extension, fInfo.LastWriteTime.ToString() }, fInfo.Name));
+                    }
+                    catch { continue; }
                 }
             }
             catch (Exception ex) { MessageBox.Show(ex.Message); }
